@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Deploy Docker
 
 on:
   push:
@@ -6,21 +6,46 @@ on:
       - main
 
 jobs:
-  docker:
+
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
 
-      - name: Docker Login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Build Image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/python-app:latest .
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Push Image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/python-app:latest
+    - name: Build Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/python-app:latest .
+
+    - name: Push Image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/python-app:latest
+
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+
+          docker pull ${{ secrets.DOCKER_USERNAME }}/python-app:latest
+
+          docker stop python-app || true
+
+          docker rm python-app || true
+
+          docker run -d \
+            --name python-app \
+            -p 5000:5000 \
+            --restart unless-stopped \
+            ${{ secrets.DOCKER_USERNAME }}/python-app:latest
