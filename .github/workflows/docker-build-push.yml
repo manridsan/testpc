@@ -40,20 +40,15 @@ jobs:
         run: |
           if kubectl get deployment python-app >/dev/null 2>&1; then
             echo "Deployment exists. Updating image..."
-            kubectl set image deployment/python-app \
-              python-app=$IMAGE
+            kubectl set image deployment/python-app   python-app=$IMAGE
 
             kubectl rollout status deployment/python-app
           else
             echo "Deployment does not exist. Creating deployment..."
 
-            kubectl create deployment python-app \
-              --image=$IMAGE
+            kubectl create deployment python-app --image=$IMAGE
 
-            kubectl expose deployment python-app \
-              --type=NodePort \
-              --port=5000 \
-              --target-port=5000
+            kubectl expose deployment python-app  --type=NodePort  --port=5000   --target-port=5000
 
             kubectl rollout status deployment/python-app
           fi
