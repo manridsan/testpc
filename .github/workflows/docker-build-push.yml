@@ -52,4 +52,4 @@ jobs:
 
             kubectl rollout status deployment/python-app
           fi
-            ${{ secrets.DOCKERHUB_USERNAME }}/python-app:latest
+            
