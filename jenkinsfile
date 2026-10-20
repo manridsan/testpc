@@ -1,18 +1,18 @@
-pipeline {
 
+pipeline {
     agent any
 
     environment {
         IMAGE_NAME = 'sankworld/nrepri'
-        DEPLOYMENT = 'abc'
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/manridsan/testpc.git'
+                // Jenkins checks out this repository
+                // before running the pipeline.
+                checkout scm
             }
         }
 
@@ -27,8 +27,6 @@ pipeline {
             }
         }
 
-      
-
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([
@@ -38,12 +36,11 @@ pipeline {
                         passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
-
                     sh '''
                         echo "$DOCKER_PASSWORD" | \
                         docker login \
-                        -u "$DOCKER_USERNAME" \
-                        --password-stdin
+                            -u "$DOCKER_USERNAME" \
+                            --password-stdin
                     '''
                 }
             }
@@ -57,7 +54,5 @@ pipeline {
                 '''
             }
         }
-       
-        
     }
 }
