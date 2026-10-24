@@ -29,7 +29,8 @@ jobs:
             sankworld/myapp:${{ github.sha }}
       - name: Configure Kubernetes API hostname
         run: |
-          echo "${{ secrets.KUBE_API_IP }} k8s-master-noble" | sudo tee -a /etc/hosts     
+          echo "${{ secrets.KUBE_API_IP }} k8s-master-noble" | sudo tee -a /etc/hosts   
+          getent hosts k8s-master-noble
       - name: Configure kubectl
         run: |
           mkdir -p ~/.kube
