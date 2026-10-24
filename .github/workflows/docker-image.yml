@@ -37,4 +37,4 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
-      - run: kubectl get nodes
+      - run: kubectl create deployment test --image=sankworld/myapp:latest
