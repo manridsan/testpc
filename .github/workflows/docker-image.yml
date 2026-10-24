@@ -27,3 +27,9 @@ jobs:
           tags: |
             sankworld/myapp:latest
             sankworld/myapp:${{ github.sha }}
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+      - run: kubectl get nodes
