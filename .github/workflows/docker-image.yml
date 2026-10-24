@@ -37,4 +37,16 @@ jobs:
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
           chmod 600 ~/.kube/config
-      - run: kubectl create deployment test --image=sankworld/myapp:latest
+      - run: |
+          if kubectl get deployment test >/dev/null 2>&1; then
+            echo "Deployment exists. Updating image..."
+
+            kubectl set image deployment/test \
+              test=sankworld/myapp:${{ github.sha }}
+          else
+            echo "Deployment does not exist. Creating it..."
+
+            kubectl create deployment test \
+              --image=sankworld/myapp:${{ github.sha }}
+          fi
+      
